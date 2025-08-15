@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
+    tipo: {
+      type: DataTypes.ENUM('admin', 'normal'),
+      defaultValue: 'normal',
+      allowNull: false
+    },
   }, {
     sequelize,
     modelName: 'Usuario',
