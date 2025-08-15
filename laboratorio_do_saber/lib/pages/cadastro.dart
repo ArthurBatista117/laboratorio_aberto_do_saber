@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
@@ -8,12 +10,43 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
+  Future<void> enviarCadastro(BuildContext context) async {
+    final url = Uri.parse(
+      "http://localhost:3000/usu",
+    ); // coloque o IP do seu backend
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "nome": controllers["nome"]!.text,
+        "cpf": controllers["cpf"]!.text,
+        "telefone": controllers["telefone"]!.text,
+        "email": controllers["email"]!.text,
+        "senha": controllers["senha"]!.text,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      final body = response.body;
+      print("Resposta: $body");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cadastro realizado com sucesso!')),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao cadastrar')));
+    }
+  }
+
   final _key_form = GlobalKey<FormState>();
 
   final Map<String, TextEditingController> controllers = {
     "nome": TextEditingController(),
-    "CPF": TextEditingController(),
-    "Telefone": TextEditingController(),
+    "cpf": TextEditingController(),
+    "telefone": TextEditingController(),
+    "email": TextEditingController(),
+    "senha": TextEditingController(),
   };
 
   @override
@@ -32,72 +65,107 @@ class _CadastroState extends State<Cadastro> {
         title: Text("L.A.S", style: TextStyle(fontSize: 50)),
         backgroundColor: Colors.green,
       ),
-      body: Form(
-        key: _key_form,
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Cadastro", style: TextStyle(fontSize: 30)),
+      body: Builder(
+        builder: (context) => Form(
+          key: _key_form,
+          child: Center(
+            child: Column(
+              children: [
+                //nome
+                TextFormField(
+                  controller: controllers["nome"],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Por favor digite seu nome";
+                    } else if (value.length < 2) {
+                      return "Digite um nome válido";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Nome",
+                  ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    //nome
-                    TextFormField(
-                      controller: controllers["nome"],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Por favor digite seu nome";
-                        } else if (value.length < 2) {
-                          return "Digite um nome válido";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Nome",
-                      ),
-                    ),
-                    Text('\n'),
-                    //CPF
-                    TextFormField(
-                      controller: controllers["CPF"],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Por favor digite seu CPF";
-                        } else if (value.length != 11) {
-                          return "Digite um CPF válido";
-                        } else if (int.tryParse(value) == null) {
-                          return "Seu CPF deve conter apenas números";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "CPF",
-                      ),
-                    ),
-                    Text("\n"),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_key_form.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Realizando cadastro...')),
-                          );
-                        }
-                      },
-                      child: Text("Cadastrar"),
-                    ),
-                  ],
+                Text('\n'),
+                //CPF
+                TextFormField(
+                  controller: controllers["cpf"],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Por favor digite seu CPF";
+                    } else if (value.length != 11) {
+                      return "Digite um CPF válido";
+                    } else if (int.tryParse(value) == null) {
+                      return "Seu CPF deve conter apenas números";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "CPF",
+                  ),
                 ),
-              ),
-            ],
+                Text("\n"),
+                //email
+                TextFormField(
+                  controller: controllers['email'],
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'email',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Esse campo é obrigatório';
+                    }
+                    return null;
+                  },
+                ),
+                Text("\n"),
+                //senha
+                TextFormField(
+                  controller: controllers['senha'],
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'senha',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Digite uma senha';
+                    } else if (value.length < 6) {
+                      return 'Sua senha deve ter mais de 6 dígitos';
+                    }
+                    return null;
+                  },
+                ),
+                Text("\n"),
+                //telefone
+                TextFormField(
+                  controller: controllers['telefone'],
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Telefone',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Seu telefone';
+                    } else if (int.tryParse(value) == null) {
+                      return 'Digite apenas números';
+                    }
+                    return null;
+                  },
+                ),
+                Text("\n"),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_key_form.currentState!.validate()) {
+                      await enviarCadastro(context);
+                    }
+                  },
+                  child: Text("Cadastrar"),
+                ),
+              ],
+            ),
           ),
         ),
       ),

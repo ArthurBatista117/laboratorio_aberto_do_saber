@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:laboratorio_do_saber/pages/cadastro.dart';
 import 'package:laboratorio_do_saber/pages/homePage.dart';
 
 void main() {
