@@ -3,6 +3,7 @@ import 'package:laboratorio_do_saber/pages/cadastro.dart';
 import 'package:laboratorio_do_saber/pages/lerQrcode.dart';
 import 'package:laboratorio_do_saber/pages/login.dart';
 import 'package:laboratorio_do_saber/pages/notificacao.dart';
+
 import 'package:laboratorio_do_saber/pages/sobre.dart';
 
 class HomePage extends StatelessWidget {
@@ -85,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Notificacao())
+                  MaterialPageRoute(builder: (context) => NotificationScreen())
                 );
               },
 
