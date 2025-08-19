@@ -12,8 +12,8 @@ class Cadastro extends StatefulWidget {
 class _CadastroState extends State<Cadastro> {
   Future<void> enviarCadastro(BuildContext context) async {
     final url = Uri.parse(
-      "http://localhost:3000/usu",
-    ); // coloque o IP do seu backend
+      "https://laboratorio-aberto-do-saber-6.onrender.com/usu",
+    ); 
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
