@@ -8,17 +8,19 @@ class UsuarioController {
         }
         catch (error) {
             console.error(error);
+            return res.status(500).json({ error: "Erro interno do servidor" });
         }
     }
     async show(req, res) {
         try {
             //console.log('paramêtros recebidos: ', req.params);
             const id = req.params.id;
-            const usuario = await Usuario.findById(id);
+            const usuario = await Usuario.findByPk(id);
             return res.status(200).json(usuario);
         }
         catch (error) {
             console.error(error);
+            return res.status(500).json({ error: "Erro interno do servidor" });
         }
     }
     async create(req, res) {
@@ -33,6 +35,7 @@ class UsuarioController {
         }
         catch (error) {
             console.error(error);
+            return res.status(500).json({ error: "Erro interno do servidor" });
         }
     }
     async update(req, res) {
@@ -67,6 +70,7 @@ class UsuarioController {
             return res.json('Usuário apagado');
         }catch(error){
             console.error(error);
+            return res.status(500).json({ error: "Erro interno do servidor" });
         }
     }
 }
