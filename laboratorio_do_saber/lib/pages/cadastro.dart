@@ -13,7 +13,7 @@ class _CadastroState extends State<Cadastro> {
   Future<void> enviarCadastro(BuildContext context) async {
     final url = Uri.parse(
       "https://laboratorio-aberto-do-saber-6.onrender.com/usu",
-    ); 
+    );
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -71,98 +71,104 @@ class _CadastroState extends State<Cadastro> {
           child: Center(
             child: Column(
               children: [
-                //nome
-                TextFormField(
-                  controller: controllers["nome"],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Por favor digite seu nome";
-                    } else if (value.length < 2) {
-                      return "Digite um nome válido";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Nome",
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: controllers["nome"],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Por favor digite seu nome";
+                          } else if (value.length < 2) {
+                            return "Digite um nome válido";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Nome",
+                        ),
+                      ),
+                      Text('\n'),
+                      //CPF
+                      TextFormField(
+                        controller: controllers["cpf"],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Por favor digite seu CPF";
+                          } else if (value.length != 11) {
+                            return "Digite um CPF válido";
+                          } else if (int.tryParse(value) == null) {
+                            return "Seu CPF deve conter apenas números";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "CPF",
+                        ),
+                      ),
+                      Text("\n"),
+                      //email
+                      TextFormField(
+                        controller: controllers['email'],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'email',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Esse campo é obrigatório';
+                          }
+                          return null;
+                        },
+                      ),
+                      Text("\n"),
+                      //senha
+                      TextFormField(
+                        controller: controllers['senha'],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'senha',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Digite uma senha';
+                          } else if (value.length < 6) {
+                            return 'Sua senha deve ter mais de 6 dígitos';
+                          }
+                          return null;
+                        },
+                      ),
+                      Text("\n"),
+                      //telefone
+                      TextFormField(
+                        controller: controllers['telefone'],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Telefone',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Seu telefone';
+                          } else if (int.tryParse(value) == null) {
+                            return 'Digite apenas números';
+                          }
+                          return null;
+                        },
+                      ),
+                      Text("\n"),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_key_form.currentState!.validate()) {
+                            await enviarCadastro(context);
+                          }
+                        },
+                        child: Text("Cadastrar"),
+                      ),
+                    ],
                   ),
-                ),
-                Text('\n'),
-                //CPF
-                TextFormField(
-                  controller: controllers["cpf"],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Por favor digite seu CPF";
-                    } else if (value.length != 11) {
-                      return "Digite um CPF válido";
-                    } else if (int.tryParse(value) == null) {
-                      return "Seu CPF deve conter apenas números";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "CPF",
-                  ),
-                ),
-                Text("\n"),
-                //email
-                TextFormField(
-                  controller: controllers['email'],
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'email',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Esse campo é obrigatório';
-                    }
-                    return null;
-                  },
-                ),
-                Text("\n"),
-                //senha
-                TextFormField(
-                  controller: controllers['senha'],
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'senha',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Digite uma senha';
-                    } else if (value.length < 6) {
-                      return 'Sua senha deve ter mais de 6 dígitos';
-                    }
-                    return null;
-                  },
-                ),
-                Text("\n"),
-                //telefone
-                TextFormField(
-                  controller: controllers['telefone'],
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Telefone',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Seu telefone';
-                    } else if (int.tryParse(value) == null) {
-                      return 'Digite apenas números';
-                    }
-                    return null;
-                  },
-                ),
-                Text("\n"),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_key_form.currentState!.validate()) {
-                      await enviarCadastro(context);
-                    }
-                  },
-                  child: Text("Cadastrar"),
                 ),
               ],
             ),
