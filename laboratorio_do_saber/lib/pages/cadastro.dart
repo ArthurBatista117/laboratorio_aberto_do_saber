@@ -61,6 +61,7 @@ class _CadastroState extends State<Cadastro> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: Text("L.A.S", style: TextStyle(fontSize: 50)),
         backgroundColor: Colors.green,
@@ -69,6 +70,7 @@ class _CadastroState extends State<Cadastro> {
         builder: (context) => Form(
           key: _key_form,
           child: Center(
+            
             child: Column(
               children: [
                 Padding(

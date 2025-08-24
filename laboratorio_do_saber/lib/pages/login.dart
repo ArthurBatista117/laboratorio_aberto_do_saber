@@ -11,9 +11,8 @@ class _LoginState extends State<Login> {
   final _key_form = GlobalKey<FormState>();
 
   final Map<String, TextEditingController> controllers = {
-    "nome": TextEditingController(),
-    "CPF": TextEditingController(),
-    "Telefone": TextEditingController(),
+    "email": TextEditingController(),
+    "senha": TextEditingController(),
   };
 
   @override
@@ -28,6 +27,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: Text("L.A.S", style: TextStyle(fontSize: 50)),
         backgroundColor: Colors.green,
@@ -50,37 +50,35 @@ class _LoginState extends State<Login> {
                   children: [
                     //nome
                     TextFormField(
-                      controller: controllers["nome"],
+                      controller: controllers["email"],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Por favor digite seu nome";
+                          return "Por favor digite seu email";
                         } else if (value.length < 2) {
-                          return "Digite um nome válido";
+                          return "Digite um email válido";
                         }
                         return null;
                       },
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: "Nome",
+                        labelText: "Email",
                       ),
                     ),
                     Text('\n'),
                     //CPF
                     TextFormField(
-                      controller: controllers["CPF"],
+                      controller: controllers["senha"],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Por favor digite seu CPF";
-                        } else if (value.length != 11) {
-                          return "Digite um CPF válido";
-                        } else if (int.tryParse(value) == null) {
-                          return "Seu CPF deve conter apenas números";
-                        }
+                          return "Por favor digite sua senha";
+                        } else if (value.length < 6) {
+                          return "Digite uma senha válida";
+                        } 
                         return null;
                       },
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: "CPF",
+                        labelText: "Senha",
                       ),
                     ),
                     Text("\n"),

@@ -14,6 +14,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
 
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: Text("L.A.S", style: TextStyle(fontSize: 50)),
         backgroundColor: Colors.green,
@@ -115,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(builder: (context) => Login())
                       );
                   },
-                  child: Text("Login"),
+                  child: Row(children: [Icon(Icons.login), Text("Login")],)
                 ),
 
                 Padding(padding: EdgeInsets.all(10)),
