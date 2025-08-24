@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -8,10 +10,28 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  bool whatsappNotification = false; // seu estado
+
+  Future<void> sendWhatsAppMessage() async {
+    var url = Uri.parse(
+      "http://laboratorio-aberto-do-saber-6.onrender.com/whatsapp/send",
+    );
+
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "to": "5573989010496", // número de destino
+        "message": "Notificação automática via Flutter 🚀",
+      }),
+    );
+
+    print("Resposta: ${response.body}");
+  }
+
   TimeOfDay selectedTime = TimeOfDay.now();
-  bool whatsappNotification = false;
   bool alarmSound = false;
-  
+
   List<bool> selectedDays = [false, false, false, false, false, false, false];
   List<String> weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
@@ -23,9 +43,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: Colors.green,
         title: const Text(
           'Configurar Notificação',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
         elevation: 0,
       ),
@@ -209,7 +227,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    
+
                     // Toggle WhatsApp
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -263,6 +281,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 setState(() {
                                   whatsappNotification = value;
                                 });
+
+                                if (value) {
+                                  // quando ligar o switch, dispara a mensagem
+                                  sendWhatsAppMessage();
+                                }
                               },
                               activeThumbColor: Colors.green,
                             ),
@@ -442,18 +465,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     // Aqui você pode implementar a lógica para salvar a notificação
     // Por exemplo, salvar no banco de dados local, SharedPreferences, etc.
-    
+
     print('Notificação salva: $notificationData');
-    
+
     // Mostrar confirmação
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Notificação configurada com sucesso!'),
         backgroundColor: Colors.green[600],
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
 
