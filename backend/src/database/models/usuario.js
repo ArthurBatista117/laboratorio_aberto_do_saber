@@ -1,27 +1,50 @@
 'use strict';
-const { Model } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   class Usuario extends Model {
     static associate(models) {
-      // define associações aqui
+      // aqui você define associações, se houver
+      // ex: Usuario.hasMany(models.Post);
     }
   }
 
   Usuario.init({
-    nome: DataTypes.STRING,
-    email: { type: DataTypes.STRING, unique: true },
-    senha: DataTypes.STRING,
-    cpf: { type: DataTypes.STRING, unique: true },
-    telefone: { type: DataTypes.STRING, unique: true },
-    tipo: { type: DataTypes.ENUM('admin', 'normal'), defaultValue: 'normal', allowNull: false },
+    nome: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    senha: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    cpf: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    telefone: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    tipo: {
+      type: DataTypes.ENUM('admin', 'normal'),
+      defaultValue: 'normal',
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'Usuario',
-    tableName: 'Usuarios', // <-- aqui você força o nome da tabela
-    timestamps: true,      // createdAt e updatedAt
+    tableName: 'Usuarios',   // força o nome exato da tabela
+    freezeTableName: true,   // evita pluralização automática
+    timestamps: true         // createdAt e updatedAt
   });
 
   return Usuario;
 };
-
