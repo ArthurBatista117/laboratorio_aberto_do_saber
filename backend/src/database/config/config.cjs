@@ -1,29 +1,12 @@
-const { Sequelize } = require("sequelize");
+require('dotenv').config();
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  protocol: "postgres",
-  logging: false, // deixa true se quiser ver os SQLs no log
-  dialectOptions: {
-    ssl: process.env.NODE_ENV === "production"
-      ? { require: true, rejectUnauthorized: false }
-      : false
+module.exports = {
+  development: {
+    url: process.env.DATABASE_URL,
+    dialect: 'postgres',
   },
-  retry: {
-    max: 5,          // tenta até 5 vezes
-    match: [
-      /ECONNREFUSED/,
-      /ETIMEDOUT/,
-      /EHOSTUNREACH/,
-      /EPIPE/,
-      /SequelizeConnectionError/,
-      /SequelizeConnectionRefusedError/,
-      /SequelizeHostNotFoundError/,
-      /SequelizeHostNotReachableError/,
-      /SequelizeInvalidConnectionError/,
-      /SequelizeConnectionTimedOutError/
-    ]
+  production: {
+    url: process.env.DATABASE_URL,
+    dialect: 'postgres',
   }
-});
-
-module.exports = sequelize;
+};
