@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Usuario',
-    tableName: 'usuarios', // <-- aqui você força o nome da tabela
+    tableName: 'Usuarios', // <-- aqui você força o nome da tabela
     timestamps: true,      // createdAt e updatedAt
   });
 
