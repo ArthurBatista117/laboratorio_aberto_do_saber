@@ -26,3 +26,7 @@ module.exports = {
     dialectOptions: {}
   }
 }
+
+sequelize.authenticate()
+  .then(() => console.log("Conexão estabelecida com o banco"))
+  .catch(err => console.error("Erro ao conectar:", err));
