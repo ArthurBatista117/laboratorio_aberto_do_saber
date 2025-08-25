@@ -14,15 +14,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> sendWhatsAppMessage() async {
     var url = Uri.parse(
-      "http://laboratorio-aberto-do-saber-6.onrender.com/whatsapp/send",
+      "http://localhost:3000/whatsapp/send",
     );
 
     var response = await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json","Authorization": "Bearer"},
       body: jsonEncode({
         "to": "5573989010496", // número de destino
-        "message": "Notificação automática via Flutter 🚀",
+        "message": "Olá, não esqueça de conferir as nossas atualizações!",
       }),
     );
 
