@@ -14,7 +14,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> sendWhatsAppMessage() async {
     var url = Uri.parse(
-      "http://localhost:3000/whatsapp/send",
+      "https://laboratorio-aberto-do-saber-6.onrender.com/whatsapp/send",
     );
 
     var response = await http.post(
