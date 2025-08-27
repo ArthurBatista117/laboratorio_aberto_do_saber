@@ -33,16 +33,17 @@ class UsuarioController {
                 return res.status(400).json({ error: 'Sem corpo da requisição' });
             }
             const { nome, email, senha, cpf, telefone } = req.body;
-            const cpfLimpo = req.body.cpf.replace(/\D/g, '');       // só números
-            const telefoneLimpo = req.body.telefone.replace(/\D/g, '');
             const hash_senha = await hashUser.encripitar(senha);
+            console.log("Senha hasheada:", hash_senha);
             const newUsuario = await Usuario.create({
-                nome: req.body.nome.trim(),
-                email: req.body.email,
+                nome: nome,
+                email: email,
                 senha: hash_senha,
-                cpf: cpfLimpo,
-                telefone: telefoneLimpo
+                cpf: cpf,
+                telefone: telefone
             });
+
+            console.log("Usuario criado:", newUsuario.toJSON());
 
             return res.status(201).json({
                 "message": "Usuário criado",
