@@ -31,7 +31,6 @@ class UsuarioController {
             if (!req.body) {
                 return res.status(400).json({ error: 'Sem corpo da requisição' });
             }
-            const hash_token = hashUser.encripitar(refresh_token);
             const { nome, email, senha, cpf, telefone } = req.body;
             const hash_senha = await hashUser.encripitar(senha);
             const newUsuario = await Usuario.create({ nome, email, senha: hash_senha, cpf, telefone });
@@ -75,7 +74,7 @@ class UsuarioController {
             await usuario.save();
 
             // Retornar token para o frontend
-            return res.status(200).json({
+            return res.status(201).json({
                 message: 'Login realizado com sucesso',
                 access_token,
                 refresh_token: refresh_token

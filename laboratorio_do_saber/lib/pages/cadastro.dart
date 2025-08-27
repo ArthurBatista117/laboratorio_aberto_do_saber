@@ -26,6 +26,9 @@ class _CadastroState extends State<Cadastro> {
       }),
     );
 
+    print('Status code: ${response.statusCode}');
+    print('Body: ${response.body}');
+
     if (response.statusCode == 201) {
       final body = response.body;
       print("Resposta: $body");
@@ -33,6 +36,8 @@ class _CadastroState extends State<Cadastro> {
         SnackBar(content: Text('Cadastro realizado com sucesso!')),
       );
     } else {
+      final body = response.body;
+      print("Resposta: $body");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Erro ao cadastrar')));
@@ -70,7 +75,6 @@ class _CadastroState extends State<Cadastro> {
         builder: (context) => Form(
           key: _key_form,
           child: Center(
-            
             child: Column(
               children: [
                 Padding(
