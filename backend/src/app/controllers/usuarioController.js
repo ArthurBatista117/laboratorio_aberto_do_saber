@@ -26,16 +26,23 @@ class UsuarioController {
         }
     }
     async cadastro(req, res) {
-        console.log('Chegou no endpoint /cadastro');
-        console.log('Body recebido:', req.body);
+        //console.log('Chegou no endpoint /cadastro');
+        //console.log('Body recebido:', req.body);
         try {
-            //console.log('Body recebido:', req.body);
             if (!req.body) {
                 return res.status(400).json({ error: 'Sem corpo da requisição' });
             }
             const { nome, email, senha, cpf, telefone } = req.body;
+            const cpfLimpo = req.body.cpf.replace(/\D/g, '');       // só números
+            const telefoneLimpo = req.body.telefone.replace(/\D/g, '');
             const hash_senha = await hashUser.encripitar(senha);
-            const newUsuario = await Usuario.create({ nome, email, senha: hash_senha, cpf, telefone });
+            const newUsuario = await Usuario.create({
+                nome: req.body.nome.trim(),
+                email: req.body.email,
+                senha: hash_senha,
+                cpf: cpfLimpo,
+                telefone: telefoneLimpo
+            });
 
             return res.status(201).json({
                 "message": "Usuário criado",
@@ -43,7 +50,10 @@ class UsuarioController {
             });
         }
         catch (error) {
-            console.error(error);
+            console.error("Erro no cadastro:", error);
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                return res.status(400).json({ error: "CPF, email ou telefone já cadastrado" });
+            }
             return res.status(500).json({ error: "Erro interno do servidor" });
         }
     }
