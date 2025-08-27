@@ -26,6 +26,8 @@ class UsuarioController {
         }
     }
     async cadastro(req, res) {
+        console.log('Chegou no endpoint /cadastro');
+        console.log('Body recebido:', req.body);
         try {
             //console.log('Body recebido:', req.body);
             if (!req.body) {

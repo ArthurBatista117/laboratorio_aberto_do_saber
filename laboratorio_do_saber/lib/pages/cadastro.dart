@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+var cpfMask = MaskTextInputFormatter(
+  mask: '###.###.###-##',
+  filter: { "#": RegExp(r'[0-9]') },
+  type: MaskAutoCompletionType.eager
+);
+
+var telefoneMask = MaskTextInputFormatter(
+  mask: '(##) #####-####',
+  filter: { "#": RegExp(r'[0-9]') },
+  type: MaskAutoCompletionType.eager
+);
 
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
@@ -81,6 +94,7 @@ class _CadastroState extends State<Cadastro> {
                   padding: EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      //NOME
                       TextFormField(
                         controller: controllers["nome"],
                         validator: (value) {
@@ -100,13 +114,10 @@ class _CadastroState extends State<Cadastro> {
                       //CPF
                       TextFormField(
                         controller: controllers["cpf"],
+                        inputFormatters: [cpfMask],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Por favor digite seu CPF";
-                          } else if (value.length != 11) {
-                            return "Digite um CPF válido";
-                          } else if (int.tryParse(value) == null) {
-                            return "Seu CPF deve conter apenas números";
                           }
                           return null;
                         },
@@ -151,6 +162,7 @@ class _CadastroState extends State<Cadastro> {
                       //telefone
                       TextFormField(
                         controller: controllers['telefone'],
+                        inputFormatters: [telefoneMask],
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Telefone',
@@ -158,9 +170,7 @@ class _CadastroState extends State<Cadastro> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Seu telefone';
-                          } else if (int.tryParse(value) == null) {
-                            return 'Digite apenas números';
-                          }
+                          } 
                           return null;
                         },
                       ),

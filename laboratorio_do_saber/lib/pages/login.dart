@@ -48,7 +48,7 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    //nome
+                    //EMAIL
                     TextFormField(
                       controller: controllers["email"],
                       validator: (value) {
@@ -65,7 +65,8 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     Text('\n'),
-                    //CPF
+
+                    //SENHA
                     TextFormField(
                       controller: controllers["senha"],
                       validator: (value) {
