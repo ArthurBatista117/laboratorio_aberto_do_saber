@@ -11,5 +11,7 @@ Router.post('/login', usuarioController.login);
 Router.put('/alterarusuario', usuarioController.update);
 Router.delete('/delete', usuarioController.destroy)
 Router.post('/whatsapp/send', whatsappController.sendMessage);
+Router.get('/ping', (req, res) => res.send('pong'));
+
 
 module.exports = Router;
