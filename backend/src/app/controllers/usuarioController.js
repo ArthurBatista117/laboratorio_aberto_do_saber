@@ -26,13 +26,13 @@ class UsuarioController {
         }
     }
     async cadastro(req, res) {
-        //console.log('Chegou no endpoint /cadastro');
-        //console.log('Body recebido:', req.body);
+        console.log('Chegou no endpoint /cadastro');
+        console.log('Body recebido:', req.body);
         try {
-            if (!req.body) {
-                return res.status(400).json({ error: 'Sem corpo da requisição' });
-            }
             const { nome, email, senha, cpf, telefone } = req.body;
+            if (!nome || !email || !senha || !cpf || !telefone) {
+                return res.status(400).json({ error: 'Campos obrigatórios faltando' });
+            }
             const hash_senha = await hashUser.encripitar(senha);
             console.log("Senha hasheada:", hash_senha);
             const newUsuario = await Usuario.create({
@@ -47,7 +47,7 @@ class UsuarioController {
 
             return res.status(201).json({
                 "message": "Usuário criado",
-                "Usuario": newUsuario
+                "Usuario": newUsuario.toJSON()
             });
         }
         catch (error) {
