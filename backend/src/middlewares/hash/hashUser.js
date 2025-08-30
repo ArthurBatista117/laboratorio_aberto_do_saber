@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 
 const hashUser = {
     encripitar: async (senha) => {
-        const salt = 20;
+        const salt = 10;
         const hash = await bcrypt.hash(senha, salt);
         return hash;
     },

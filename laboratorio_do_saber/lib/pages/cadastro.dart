@@ -5,14 +5,14 @@ import 'dart:convert';
 
 var cpfMask = MaskTextInputFormatter(
   mask: '###.###.###-##',
-  filter: { "#": RegExp(r'[0-9]') },
-  type: MaskAutoCompletionType.eager
+  filter: {"#": RegExp(r'[0-9]')},
+  type: MaskAutoCompletionType.eager,
 );
 
 var telefoneMask = MaskTextInputFormatter(
   mask: '(##) #####-####',
-  filter: { "#": RegExp(r'[0-9]') },
-  type: MaskAutoCompletionType.eager
+  filter: {"#": RegExp(r'[0-9]')},
+  type: MaskAutoCompletionType.eager,
 );
 
 class Cadastro extends StatefulWidget {
@@ -43,17 +43,17 @@ class _CadastroState extends State<Cadastro> {
     print('Body: ${response.body}');
 
     if (response.statusCode == 201) {
-      final body = response.body;
-      print("Resposta: $body");
+      final data = jsonDecode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cadastro realizado com sucesso!')),
+        SnackBar(
+          content: Text(data['message'] ?? 'Cadastro realizado com sucesso!'),
+        ),
       );
     } else {
-      final body = response.body;
-      print("Resposta: $body");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao cadastrar')));
+      final data = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['error'] ?? 'Erro ao cadastrar')),
+      );
     }
   }
 
@@ -170,7 +170,7 @@ class _CadastroState extends State<Cadastro> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Seu telefone';
-                          } 
+                          }
                           return null;
                         },
                       ),
