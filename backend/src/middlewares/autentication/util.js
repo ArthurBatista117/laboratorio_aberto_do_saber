@@ -17,11 +17,11 @@ const tokens = {
             return false;
         }
     },
-    gerar_refresh_token: async () =>{
+    gerar_refresh_token: () =>{
         const refresh_token = crypto.randomBytes(32).toString('hex');
         return refresh_token;
     },
-    verificar_refresh_token: async (token, token_bd) =>{
+    verificar_refresh_token: (token, token_bd) =>{
         return token === token_bd;
     }
 }
