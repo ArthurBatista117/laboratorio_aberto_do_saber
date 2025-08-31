@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class NotificationScreen extends StatefulWidget {
@@ -10,416 +12,143 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  bool whatsappNotification = false; // seu estado
-
-  Future<void> sendWhatsAppMessage() async {
-    var url = Uri.parse(
-      "https://laboratorio-aberto-do-saber-6.onrender.com/whatsapp/send",
-    );
-
-    var response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json","Authorization": "Bearer"},
-      body: jsonEncode({
-        "to": "5573989010496", // número de destino
-        "message": "Olá, não esqueça de conferir as nossas atualizações!",
-      }),
-    );
-
-    print("Resposta: ${response.body}");
-  }
-
+  bool whatsappNotification = false;
   TimeOfDay selectedTime = TimeOfDay.now();
   bool alarmSound = false;
 
   List<bool> selectedDays = [false, false, false, false, false, false, false];
   List<String> weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green[50],
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: const Text(
-          'Configurar Notificação',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Card de Horário
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          color: Colors.green[700],
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Horário',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    InkWell(
-                      onTap: () => _selectTime(context),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 15,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.grey[50],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              selectedTime.format(context),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.grey[600],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+  void initState() {
+    super.initState();
+    _initNotifications();
+    _loadNotificationSettings();
+  }
 
-            const SizedBox(height: 20),
+  Future<void> _initNotifications() async {
+    if (await Permission.notification.request().isGranted) {
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
-            // Card de Dias da Semana
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          color: Colors.green[700],
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Dias da Semana',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(7, (index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedDays[index] = !selectedDays[index];
-                            });
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: selectedDays[index]
-                                  ? Colors.green[700]
-                                  : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: selectedDays[index]
-                                    ? Colors.green[700]!
-                                    : Colors.grey[400]!,
-                                width: 1,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                weekDays[index],
-                                style: TextStyle(
-                                  color: selectedDays[index]
-                                      ? Colors.white
-                                      : Colors.grey[700],
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      final DarwinInitializationSettings initializationSettingsIOS =
+          DarwinInitializationSettings(
+        requestSoundPermission: true,
+        requestBadgePermission: true,
+        requestAlertPermission: true,
+      );
 
-            const SizedBox(height: 20),
+      final InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
 
-            // Card de Tipos de Notificação
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.notifications_active,
-                          color: Colors.green[700],
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Tipos de Notificação',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
+      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    }
+  }
 
-                    // Toggle WhatsApp
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green[100]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.green[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Icon(
-                              Icons.chat,
-                              color: Colors.green,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'WhatsApp',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Enviar notificação via WhatsApp',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Transform.scale(
-                            scale: 0.9,
-                            child: Switch(
-                              value: whatsappNotification,
-                              onChanged: (value) {
-                                setState(() {
-                                  whatsappNotification = value;
-                                });
+  Future<void> _loadNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
 
-                                if (value) {
-                                  // quando ligar o switch, dispara a mensagem
-                                  sendWhatsAppMessage();
-                                }
-                              },
-                              activeThumbColor: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+    setState(() {
+      // Horário
+      final hour = prefs.getInt('alarm_hour') ?? selectedTime.hour;
+      final minute = prefs.getInt('alarm_minute') ?? selectedTime.minute;
+      selectedTime = TimeOfDay(hour: hour, minute: minute);
 
-                    const SizedBox(height: 15),
+      // Dias
+      final daysJson = prefs.getString('alarm_days');
+      if (daysJson != null) {
+        List<dynamic> savedDays = jsonDecode(daysJson);
+        selectedDays = savedDays.map((e) => e as bool).toList();
+      }
 
-                    // Toggle Alarme Sonoro
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.orange[100]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.orange[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Icon(
-                              Icons.volume_up,
-                              color: Colors.orange,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Alarme Sonoro',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Tocar alarme sonoro no dispositivo',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Transform.scale(
-                            scale: 0.9,
-                            child: Switch(
-                              value: alarmSound,
-                              onChanged: (value) {
-                                setState(() {
-                                  alarmSound = value;
-                                });
-                              },
-                              activeThumbColor: Colors.orange,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      // WhatsApp e alarme
+      whatsappNotification = prefs.getBool('whatsapp') ?? false;
+      alarmSound = prefs.getBool('alarm') ?? false;
+    });
+  }
 
-            const SizedBox(height: 30),
+  Future<void> _saveNotification() async {
+    final prefs = await SharedPreferences.getInstance();
 
-            // Botões de Ação
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Cancelar
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      foregroundColor: Colors.grey[700],
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _saveNotification();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[700],
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: const Text(
-                      'Salvar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    // Salvar horário
+    await prefs.setInt('alarm_hour', selectedTime.hour);
+    await prefs.setInt('alarm_minute', selectedTime.minute);
+
+    // Salvar dias
+    await prefs.setString('alarm_days', jsonEncode(selectedDays));
+
+    // Salvar toggles
+    await prefs.setBool('whatsapp', whatsappNotification);
+    await prefs.setBool('alarm', alarmSound);
+
+    // Agendar alarmes
+    if (alarmSound) {
+      List<int> activeDays = [];
+      for (int i = 0; i < selectedDays.length; i++) {
+        if (selectedDays[i]) {
+          // Domingo=7, Segunda=1 ...
+          activeDays.add(i == 0 ? 7 : i);
+        }
+      }
+      if (activeDays.isNotEmpty) {
+        await scheduleAlarm(selectedTime, activeDays);
+      }
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Notificação configurada com sucesso!'),
+        backgroundColor: Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+
+    Navigator.pop(context);
+  }
+
+  Future<void> scheduleAlarm(TimeOfDay time, List<int> daysOfWeek) async {
+    final now = DateTime.now();
+
+    for (int weekday in daysOfWeek) {
+      DateTime scheduledDate = DateTime(
+        now.year,
+        now.month,
+        now.day + ((weekday - now.weekday + 7) % 7),
+        time.hour,
+        time.minute,
+      );
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        weekday, // ID único
+        'Alarme',
+        'Hora do alarme!',
+        scheduledDate.toLocal(),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'alarm_channel',
+            'Alarme',
+            channelDescription: 'Canal para alarmes',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            sound: RawResourceAndroidNotificationSound('alarm'), // res/raw/alarm.mp3
+          ),
+          iOS: DarwinNotificationDetails(
+            sound: 'alarm.aiff',
+          ),
+        ),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      );
+    }
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -446,39 +175,151 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  void _saveNotification() {
-    // Lista dos dias selecionados
-    List<String> activeDays = [];
-    for (int i = 0; i < selectedDays.length; i++) {
-      if (selectedDays[i]) {
-        activeDays.add(weekDays[i]);
-      }
-    }
-
-    // Dados da notificação
-    Map<String, dynamic> notificationData = {
-      'time': selectedTime.format(context),
-      'days': activeDays,
-      'whatsapp': whatsappNotification,
-      'alarm': alarmSound,
-    };
-
-    // Aqui você pode implementar a lógica para salvar a notificação
-    // Por exemplo, salvar no banco de dados local, SharedPreferences, etc.
-
-    print('Notificação salva: $notificationData');
-
-    // Mostrar confirmação
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Notificação configurada com sucesso!'),
-        backgroundColor: Colors.green[600],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.green[50],
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        title: const Text('Configurar Notificação'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Horário
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: InkWell(
+                  onTap: () => _selectTime(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Horário: ${selectedTime.format(context)}'),
+                      const Icon(Icons.keyboard_arrow_down),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Dias
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(7, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedDays[index] = !selectedDays[index];
+                        });
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: selectedDays[index]
+                              ? Colors.green[700]
+                              : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Text(
+                            weekDays[index],
+                            style: TextStyle(
+                              color: selectedDays[index]
+                                  ? Colors.white
+                                  : Colors.grey[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Tipos de notificação
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    // WhatsApp
+                    Row(
+                      children: [
+                        const Icon(Icons.chat, color: Colors.green),
+                        const SizedBox(width: 16),
+                        const Text('WhatsApp'),
+                        const Spacer(),
+                        Switch(
+                          value: whatsappNotification,
+                          onChanged: (value) {
+                            setState(() {
+                              whatsappNotification = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    // Alarme
+                    Row(
+                      children: [
+                        const Icon(Icons.volume_up, color: Colors.orange),
+                        const SizedBox(width: 16),
+                        const Text('Alarme Sonoro'),
+                        const Spacer(),
+                        Switch(
+                          value: alarmSound,
+                          onChanged: (value) {
+                            setState(() {
+                              alarmSound = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _saveNotification,
+                    child: const Text('Salvar'),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
-
-    // Voltar para a tela anterior
-    Navigator.pop(context, notificationData);
   }
 }
