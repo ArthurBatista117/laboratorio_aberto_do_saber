@@ -1,20 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class LerQrCode extends StatelessWidget {
+class LerQrCode extends StatefulWidget {
   const LerQrCode({super.key});
+
+  @override
+  State<LerQrCode> createState() => _LerQrCodeState();
+}
+
+class _LerQrCodeState extends State<LerQrCode> {
+  bool _isScanned = false;
+
+  Future<void> _handleCode(String code) async {
+    if (_isScanned) return; // impede múltiplos disparos
+    setState(() => _isScanned = true);
+
+    final uri = Uri.tryParse(code);
+
+    if (uri != null && uri.hasScheme && uri.hasAuthority) {
+      // Se for URL válida, abre no navegador
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      // Se não for URL, mostra num diálogo
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("QR Code encontrado"),
+            content: Text(code),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() => _isScanned = false); // permite ler de novo
+                },
+                child: const Text("Fechar"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 400;
     final scannerSize = screenSize.width * 0.5;
-    
+
     return Scaffold(
       backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: Text(
-          "L.A.S", 
+          "L.A.S",
           style: TextStyle(
             fontSize: isSmallScreen ? 35 : 50,
           ),
@@ -52,7 +92,7 @@ class LerQrCode extends StatelessWidget {
                               size: 32,
                               color: Colors.green[700],
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 "Aponte o QR CODE para a câmera",
@@ -73,7 +113,7 @@ class LerQrCode extends StatelessWidget {
                               size: 28,
                               color: Colors.green[700],
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               "Aponte o QR CODE para a câmera",
                               style: TextStyle(
@@ -89,9 +129,9 @@ class LerQrCode extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(height: screenSize.height * 0.02),
-              
+
               // Card com o scanner
               Expanded(
                 child: Card(
@@ -110,9 +150,11 @@ class LerQrCode extends StatelessWidget {
                         children: [
                           MobileScanner(
                             onDetect: (capture) {
-                              final List<Barcode> barcodes = capture.barcodes;
-                              for (final barcode in barcodes) {
-                                debugPrint('Código encontrado: ${barcode.rawValue}');
+                              for (final barcode in capture.barcodes) {
+                                final code = barcode.rawValue;
+                                if (code != null) {
+                                  _handleCode(code);
+                                }
                               }
                             },
                           ),
@@ -139,10 +181,10 @@ class LerQrCode extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Container(
-                                margin: EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: Colors.green.withOpacity(0.5),
+                                    color: Colors.greenAccent,
                                     width: 1,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -156,9 +198,9 @@ class LerQrCode extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(height: screenSize.height * 0.02),
-              
+
               // Card com informações adicionais
               Card(
                 elevation: 4,
@@ -183,7 +225,7 @@ class LerQrCode extends StatelessWidget {
                               size: 20,
                               color: Colors.green[600],
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 "Posicione o QR Code dentro da área destacada",
@@ -204,7 +246,7 @@ class LerQrCode extends StatelessWidget {
                               size: 18,
                               color: Colors.green[600],
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               "Posicione o QR Code dentro da área destacada",
                               style: TextStyle(
