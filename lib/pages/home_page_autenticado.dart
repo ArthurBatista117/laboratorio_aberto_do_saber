@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:project2/pages/arquivos_professor.dart';
-import 'package:project2/pages/ler_qrcode.dart';
-import 'package:project2/pages/notificacao.dart';
-import 'package:project2/pages/sobre.dart';
+import 'package:laboratorio_aberto_do_saber/pages/arquivos_professor.dart';
+import 'package:laboratorio_aberto_do_saber/pages/ler_qrcode.dart';
+import 'package:laboratorio_aberto_do_saber/pages/notificacao.dart';
+import 'package:laboratorio_aberto_do_saber/pages/sobre.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

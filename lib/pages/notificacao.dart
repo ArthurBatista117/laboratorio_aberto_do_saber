@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project2/pages/alarme.dart';
-import 'package:project2/services/notificacao_services.dart';
+import 'package:laboratorio_aberto_do_saber/pages/alarme.dart';
+import 'package:laboratorio_aberto_do_saber/services/notificacao_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
